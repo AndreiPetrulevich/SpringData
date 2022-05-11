@@ -1,10 +1,11 @@
-package config;
+package ru.gb.config;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.PropertySource;
+import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.jdbc.datasource.SimpleDriverDataSource;
 import org.springframework.orm.jpa.JpaTransactionManager;
 import org.springframework.orm.jpa.JpaVendorAdapter;
@@ -12,6 +13,8 @@ import org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean;
 import org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
+import org.springframework.web.servlet.ViewResolver;
+import org.springframework.web.servlet.view.InternalResourceViewResolver;
 
 import javax.persistence.EntityManagerFactory;
 import javax.sql.DataSource;
@@ -23,6 +26,7 @@ import java.util.Properties;
 @PropertySource("classpath:jdbc.properties")
 @ComponentScan("ru.gb")
 @EnableTransactionManagement
+@EnableJpaRepositories(basePackages = "ru.gb.dao")
 public class JpaConfig {
     @Value("${driverClassName}")
     private String driverClassName;
@@ -32,6 +36,17 @@ public class JpaConfig {
     private String username;
     @Value("${password}")
     private String password;
+
+    public static final String RESOLVER_PREFIX = "/WEB-INF/view/";
+    public static final String RESOLVER_SUFFIX = ".jsp";
+
+    @Bean
+    public ViewResolver viewResolver() {
+        InternalResourceViewResolver viewResolver = new InternalResourceViewResolver();
+        viewResolver.setPrefix(RESOLVER_PREFIX);
+        viewResolver.setSuffix(RESOLVER_SUFFIX);
+        return viewResolver;
+    }
 
     @Bean
     public DataSource dataSource() { // передаем ответсвеность за создание connection мы передаем на DataSource
